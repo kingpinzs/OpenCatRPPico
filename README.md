@@ -3,6 +3,7 @@
 OpenCat code running on a DIY setup, Raspberry Pi Pico and a PCA9685. 
 
 ~~[User manual](https://docs.petoi.com/arduino-ide/upload-sketch-for-biboard)~~
+
 No setup instructions yet but the above might work
 
 

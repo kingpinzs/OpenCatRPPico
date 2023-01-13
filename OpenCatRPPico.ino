@@ -6,7 +6,7 @@
 
 //#define BiBoard     //ESP32 Board with 12 channels of built-in PWM for joints
 //#define BiBoard2  //ESP32 Board with 16 channels of PCA9685 PWM for joints
-#define DiySetup
+#define DiySetup     //RP Pico Board connected to a PCA9685 PWM for joints
 //***********************
 
 //Send 'R' token to reset the birthmark in the EEPROM so that the robot will restart to reset
