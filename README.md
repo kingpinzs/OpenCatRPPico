@@ -1,31 +1,26 @@
-# OpenCatESP32
+# OpenCatRPPico
 
-OpenCat code running on BiBoard, an ESP32 controller. 
+OpenCat code running on a DIY setup, Raspberry Pi Pico and a PCA9685. 
 
-[User manual](https://docs.petoi.com/arduino-ide/upload-sketch-for-biboard)
+~~[User manual](https://docs.petoi.com/arduino-ide/upload-sketch-for-biboard)~~
+No setup instructions yet but the above might work
 
 
 ## Configuration:
 
-ESP32 Dev Module
+Raspberry Pi Pico
 
-* Upload Speed: 921600
+* Upload Speed: 115200
 
-* CPU Frequency: 240MHz(WiFi/BT)
+* CPU Frequency: 133 MHz (Over clock to 300mhz ???)
 
-* Flash Frequency: 80MHz
+* SRAM: 264kB
 
-* Flash Mode: QIO
+* Flash: 2MB QSPI
 
-* Flash Size: 16MB
-
-* Partition Scheme: Default 4MB with spiffs (we will add instructions on making larger partitions)
+* up to 16MB of off-chip flash
 
 * Core Debug Level: None
 
 * PSRAM: Disabled
 
-
-[![BittleESP32](https://github.com/PetoiCamp/NonCodeFiles/blob/master/gif/BiBoard.gif)](https://www.youtube.com/watch?v=GTgps_H990w)
-
-Click the GIF to open the YouTube demo.
