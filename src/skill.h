@@ -59,8 +59,7 @@ public:
   }
 #ifndef MAIN_SKETCH
   void copyDataFromPgmToI2cEeprom(unsigned int& eeAddress, unsigned int pgmAddress) {
-    
-    period = pgm_read_byte(pgmAddress);  //automatically cast to char*
+    period = pgm_read_byte(&pgmAddress);  //automatically cast to char*
     int len = dataLen(period) + 1;
     int writtenToEE = 0;
     while (len > 0) {
@@ -78,7 +77,7 @@ public:
 #endif
           return;
         }
-        Wire.write((byte)pgm_read_byte(pgmAddress + writtenToEE++));
+        Wire.write((byte)pgm_read_byte(&pgmAddress + writtenToEE++));
         writtenToWire++;
         eeAddress++;
       } while ((--len > 0) && (eeAddress % PAGE_LIMIT) && (writtenToWire < WIRE_LIMIT));  //be careful with the chained conditions
@@ -203,7 +202,8 @@ public:
     //      dataBuffer[0] = pgm_read_byte(pgmAddress++);
     int bufferLen = dataLen(period);
     for (int i = 0; i < bufferLen; i++)
-      dataBuffer[i] = pgm_read_byte(pgmAddress++);
+      dataBuffer[i] = pgm_read_byte(&pgmAddress);
+      pgmAddress++;
     //      dataBuffer[bufferLen] = '\0';
   }
 
@@ -466,7 +466,7 @@ void writeConst() {
   saveMelody(melodyAddress, melodyLowBattery, sizeof(melodyLowBattery));
   saveMelody(melodyAddress, melody1, sizeof(melody1));
 #ifndef AUTO_INIT
-  playMelody(MELODY_INIT);
+  //playMelody(MELODY_INIT);
 #endif
 #ifndef AUTO_INIT
   PTLF("Reset joint offsets?(Y/n)");  //(Input ‘Y’ and hit enter, if you want to reset all the joint offsets to 0)
@@ -477,7 +477,7 @@ void writeConst() {
 #ifndef AUTO_INIT
     if (resetJointCalibrationQ == 'Y' || resetJointCalibrationQ == 'y')
 #endif
-      EEPROM.update(CALIB + i, servoCalib[i]);
+    EEPROM.update(CALIB + i, servoCalib[i]);
     EEPROM.update(PWM_PIN + i, pwm_pin[i]);
     EEPROM.update(MID_SHIFT + i, middleShift[i]);
     EEPROM.update(ROTATION_DIRECTION + i, rotationDirection[i]);
@@ -494,9 +494,8 @@ int configureEEPROM() {
   PTLF("\n* Change model and board definitions in OpenCat.ino!");
   PTLF("\nConfigure EEPROM");
   writeConst();  // only run for the first time when writing to the board.
-  wdt_enable(WDTO_8S);
+  watchdog_enable(8, 1);
   skill.saveSkillInfoFromProgmemToOnboardEeprom();
-  wdt_reset();
   return 1;
 }
 #endif

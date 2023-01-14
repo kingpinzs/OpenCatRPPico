@@ -103,6 +103,10 @@ const uint8_t PWM_pin[PWM_NUM] = {19,  4,  2, 27,   //head or shoulder roll
 // #define TOUCH3 33
 
 //                                headPan, tilt, tailPan, NA
+byte pwm_pin[] = { 7, 0, 15, 8,
+                   6, 1, 14, 9,
+                   5, 2, 13, 10,
+                   4, 3, 12, 11 };
 const uint8_t PWM_pin[PWM_NUM] = {12,       11,     4,    3,
                                   13,       10,     5,    2,     //shoulder roll
                                   14,       9,      6,    1,     //shoulder pitch
@@ -171,7 +175,7 @@ bool newBoard = false;
 
 //on-board EEPROM addresses
 #define MELODY_NORMAL 1023  //melody will be saved at the end of the 1KB EEPROM, and is read reversely. That allows some flexibility on the melody length.
-#define MELODY_INIT 1002
+#define MELODY_INIT (byte*)1002
 #define MELODY_LOW_BATTERY 977
 #define MELODY_1 966
 #define PWM_PIN 0                     // 16 byte array
@@ -191,6 +195,10 @@ bool newBoard = false;
 #define SERIAL_BUFF_RAND 280          // 2 bytes
 #define SKILLS 320                    // 1 byte for skill name length, followed by the char array for skill name
 
+//the actual data is stored on the I2C EEPROM.
+#define INITIAL_SKILL_DATA_ADDRESS 32
+//The first several bytes are reserved for testing
+//the above constants from onboard EEPROM to I2C EEPROM
 
 #include <math.h>
 //token list
@@ -204,6 +212,7 @@ bool newBoard = false;
 #define T_HELP        'h'
 #define T_INDEXED_SIMULTANEOUS_ASC  'i'
 #define T_INDEXED_SIMULTANEOUS_BIN  'I'
+#define T_INDEXED_SEQUENTIAL_BIN 'M'
 #define T_JOINTS      'j'
 #define T_SKILL       'k'
 #define T_SKILL_DATA  'K'
@@ -258,6 +267,7 @@ char *lastCmd = new char[CMD_LEN];
 int cmdLen;
 byte newCmdIdx = 0;
 int8_t* dataBuffer = new int8_t[1524];
+int8_t yprTilt[3];
 int lastVoltage;
 bool servoOff = true;
 
@@ -283,6 +293,8 @@ int runDelay = delayMid;
 #ifdef RANDOM_MIND
 bool autoSwitch = true;
 #endif
+
+
 
 #ifdef NYBBLE
 int8_t middleShift[] = {0, 15, 0, 0,

@@ -238,6 +238,7 @@ void calibratePCA9685() {
     lastValue = actualFreq;
   }
 }
+
 void servoSetup() {
   PTF("Init servos: ");
   for (byte i = 0; i < DOF; i++) {

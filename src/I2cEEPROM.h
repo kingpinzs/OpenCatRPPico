@@ -251,7 +251,7 @@ void i2cEepromSetup()
   if (newBoard)
   {
     PTLF("Set up the new board...");
-    playMelody(melodyInit, sizeof(melodyInit) / 2);
+    //playMelody(MELODY_INIT);
     PTF("- Name the new robot as: ");
     // put name here
 #ifndef AUTO_INIT

@@ -1,3 +1,5 @@
+#include <servo.pio.h>
+
 //modify the model and board definitions
 //***********************
 #define BITTLE    //Petoi 9 DOF robot dog: 1 on head + 8 on leg

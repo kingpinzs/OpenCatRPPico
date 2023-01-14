@@ -37,7 +37,7 @@ void ledSetup() {
 }
 
 void colorWithMotion() {
-  if (skill != NULL && skill->period > 1)
+  if (skill != nullptr && skill->period > 1)
     pixelHue += (65536 / skill->period);
   else
     pixelHue += (65536 / 4096);

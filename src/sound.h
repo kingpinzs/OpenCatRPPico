@@ -102,16 +102,12 @@ void soundFallOver() {
   for (int i = 0; i < 2; i++)
     chirp();
 }
-void playMelody(byte m[], int len) {
-  for (int i = 0; i < len; i++) {
-    if (!m[i])
-      delay(1000 / m[len + i]);
-    else
-      tone(BUZZER, 1046.50 * pow(1.05946, m[i]), // C
-           1000 / m[len + i]);
-  }
+void playMelody(int start) {
+  byte len = (byte)EEPROM.read(start) / 2;
+  for (int i = 0; i < len; i++)
+    beep(EEPROM.read(start - 1 - i), 1000 / EEPROM.read(start - 1 - len - i));
 }
 
 void playSound() {
-  playMelody(melodyNormalBoot, sizeof(melodyNormalBoot) / 2);
+  //playMelody(MELODY_NORMAL);
 }

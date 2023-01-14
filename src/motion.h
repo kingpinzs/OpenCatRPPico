@@ -274,9 +274,9 @@ float levelTolerance[2] = {ROLL_LEVEL_TOLERANCE, PITCH_LEVEL_TOLERANCE}; // the 
 #define FRONT_BACK_FACTOR 1.2
 #define POSTURE_WALKING_FACTOR 0.5
 #define ADJUSTMENT_GAP_DAMPER 5
-// #ifdef POSTURE_WALKING_FACTOR
-// float postureOrWalkingFactor = 1;
-// #endif
+#ifdef POSTURE_WALKING_FACTOR
+float postureOrWalkingFactor;
+#endif
 
 #ifdef X_LEG // >< leg
 float adaptiveParameterArray[][NUM_ADAPT_PARAM] = {

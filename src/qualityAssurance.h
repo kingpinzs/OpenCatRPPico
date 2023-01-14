@@ -45,12 +45,12 @@ void testMPU() {
     if (fabs(m) > MEAN_THRESHOLD || dev > STD_THRESHOLD) {
       PTL("\tFail!");
       while (1) {
-        playMelody(mpuBad, sizeof(mpuBad) / 2);
+        //playMelody(mpuBad);
         delay(500);
       }
     } else {
       PTL("\tPass!");
-      playMelody(mpuGood, sizeof(mpuGood) / 2);
+      //playMelody(MELODY_NORMAL);
     }
   }
   delay(100);
@@ -119,14 +119,13 @@ void QA() {
     testMPU();
     //tests...
     PTL("\nServo test: all servos should rotate and in sync\n");
-    loadBySkillName("ts");  //test EEPROM
     while (1) {
       skill->perform();
 #ifdef IR_PIN
       if (testIR()) {
 #endif
         PTL("Pass");
-        playMelody(melodyIRpass, sizeof(melodyIRpass) / 2);
+        //playMelody(MELODY_NORMAL);
         break;
 #ifdef IR_PIN
       } else {

@@ -5,8 +5,6 @@
 #include "sound.h"
 //#include "I2cEEPROM.h"
 
-
-
 #ifdef VOICE
 #include "voice.h"
 #endif
@@ -23,9 +21,9 @@
 #include "io.h"
 #include "PCA9685servo.h"
 #include "motion.h"
-#include "skill.h"
+
 #ifdef NEOPIXEL_PIN
-#include "led.h"
+
 #endif
 #ifdef GYRO_PIN
 #include "imu.h"
@@ -33,12 +31,14 @@
 #ifdef IR_PIN
 #include "infrared.h"
 #endif
+#include "skill.h"
+//#include "led.h"
 
 #ifdef ULTRASONIC
 #include "ultrasonic.h"
 #endif
 #include "reaction.h"
-#include "qualityAssurance.h"
+//#include "qualityAssurance.h"
 
 
 
@@ -110,7 +110,7 @@ void initRobot() { //move the inti stuff from main file to here
   gestureSetup();
 #endif
 
-  playMelody(MELODY_NORMAL);
+  //playMelody(MELODY_NORMAL);
 
   delay(2000);  //change the delay if the app doesn't recognize the Petoi device.
 #ifdef GYRO_PIN
@@ -140,7 +140,7 @@ void initRobot() { //move the inti stuff from main file to here
   delay(500);
   PTLF("Ready!");
   idleTimer = millis();
-  playMelody(melodyNormalBoot, sizeof(melodyNormalBoot) / 2);
+  //playMelody(MELODY_NORMAL);
 #ifndef MAIN_SKETCH
   PCA9685CalibrationPrompt();
 #endif
