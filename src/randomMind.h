@@ -1,10 +1,4 @@
-#define POWER_SAVER 120 //make the robot rest after a certain period, unit is seconds
-#define IDLE_SHORT 15
-#define IDLE_LONG 30
-#define EVERY_X_SECONDS 5
-int idleThreshold = IDLE_SHORT;
-#define RANDOM_MIND true     //let the robot do random stuffs. use token 'z' to activate/deactivate
-int randomInterval = 1000;
+
 const char *randomMindList[] = {"iRand", "ksit", //"u",
 #ifdef CUB
                                 "kfd", "krt",
@@ -21,10 +15,7 @@ byte choiceWeight[] = {100, 10,// 5,
 #endif
                       };
                       
-int randomMindListLength;
-int randomBase = 0;
-long idleTimer;
-long randTimer;
+
 
 void allRandom() {
   char tokenSet[] = {T_INDEXED_SIMULTANEOUS_BIN, T_MOVE_BIN};

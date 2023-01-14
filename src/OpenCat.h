@@ -5,12 +5,7 @@
 #include "sound.h"
 //#include "I2cEEPROM.h"
 
-#ifdef GYRO_PIN
-#include "imu.h"
-#endif
-#ifdef IR_PIN
-#include "infrared.h"
-#endif
+
 
 #ifdef VOICE
 #include "voice.h"
@@ -18,7 +13,10 @@
 #ifdef CAMERA
 #include "camera.h"
 #endif
+#ifdef RANDOM_MIND
+#define ALL_RANDOM  // add random joint movements between the choice list of preset behaviors
 #include "randomMind.h"
+#endif
 #include <hardware/watchdog.h>
 //#include <avr/wdt.h> 
 #include "eeprom.h"
@@ -28,6 +26,12 @@
 #include "skill.h"
 #ifdef NEOPIXEL_PIN
 #include "led.h"
+#endif
+#ifdef GYRO_PIN
+#include "imu.h"
+#endif
+#ifdef IR_PIN
+#include "infrared.h"
 #endif
 
 #ifdef ULTRASONIC

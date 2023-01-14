@@ -88,6 +88,11 @@ const uint8_t PWM_pin[PWM_NUM] = {19,  4,  2, 27,   //head or shoulder roll
 #define BUZZER 14
 #define VOLTAGE 4
 #define LOW_VOLTAGE 6.8
+
+#define VOLTAGE_DETECTION_PIN A0  //voltage detector
+#define DEVICE_ADDRESS 0x50  //I2C Address of eeprom chip
+
+#define DEVICE_ADDRESS 0x50  //I2C Address of eeprom chip
 #define NEOPIXEL_PIN 15
 #define PWM_LED_PIN  5
 //#define I2C_EEPROM  //comment this line out if you don't have an I2C EEPROM in your DIY board.
@@ -125,6 +130,7 @@ enum ServoModel_t {
   P1S,
   P2K
 };
+
 
 //Tutorial: https://bittle.petoi.com/11-tutorial-on-creating-new-skills
 #ifdef NYBBLE
@@ -227,6 +233,19 @@ float degPerRad = 180 / M_PI;
 float radPerDeg = M_PI / 180;
 
 //control related variables
+#define POWER_SAVER 120 //make the robot rest after a certain period, unit is seconds
+#define IDLE_SHORT 15
+#define IDLE_LONG 30
+#define EVERY_X_SECONDS 5
+int idleThreshold = IDLE_SHORT;
+#define RANDOM_MIND true     //let the robot do random stuffs. use token 'z' to activate/deactivate
+
+#define IDLE_TIME 5000
+int randomMindListLength;
+int randomBase = 0;
+long randTimer;
+long idleTimer;
+int randomInterval = 1000;
 #define CHECK_BATTERY_PERIOD 10000  //every 10 seconds. 60 mins -> 3600 seconds
 int uptime = -1;
 int frame;
@@ -240,10 +259,11 @@ int cmdLen;
 byte newCmdIdx = 0;
 int8_t* dataBuffer = new int8_t[1524];
 int lastVoltage;
+bool servoOff = true;
+
 
 bool checkGyro = false;
 bool printGyro = false;
-bool autoSwitch = false;
 bool walkingQ = false;
 bool imuUpdated;
 byte exceptions = 0;
@@ -259,6 +279,10 @@ int delayMid = 8;
 int delayShort = 2;
 int delayStep = 1;
 int runDelay = delayMid;
+
+#ifdef RANDOM_MIND
+bool autoSwitch = true;
+#endif
 
 #ifdef NYBBLE
 int8_t middleShift[] = {0, 15, 0, 0,

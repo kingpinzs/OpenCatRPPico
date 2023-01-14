@@ -1,3 +1,14 @@
+char getUserInputChar() {  //take only the first character, allow "no line ending", "newline", "carriage return", and "both NL & CR"
+  while (!Serial.available())
+    ;
+  char result = Serial.read();
+  delay(1);                     //wait for the remainder to arrive
+  while (Serial.available()) {  //flush the '\r' or '\n' if any
+    Serial.read();
+  }
+  return result;
+}
+
 void read_sound() {
 }
 int read_light() {
@@ -19,16 +30,7 @@ void read_touch() {
   //  PTL();
 }
 #endif
-void readEnvironment() {
-#ifdef GYRO_PIN
-  if (checkGyro)
-    imuUpdated = read_IMU();
-#endif
-  read_sound();
-  read_light();
-  read_distance();
-  read_GPS();
-}
+
 
 template <typename T> void arrayNCPY(T * destination, const T * source, int len) { //deep copy regardless of '\0'
   for (int i = 0; i < len; i++)
@@ -109,10 +111,11 @@ void readSignal() {
     // powerSaver -> 4
     // other -> 5
     // randomMind -> 100
-
+#ifdef RANDOM_MIND
     if (autoSwitch && newCmdIdx == 0)
       randomMind();//make the robot do random demos
   }
+#endif
 }
 
 void printToken(char t = token) {
