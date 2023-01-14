@@ -1,15 +1,17 @@
 #include "OpenCatSettings.h" //move all the define and setting code here
 
+#include <EEPROM.h>
+
 #include "sound.h"
-#include "I2cEEPROM.h"
-#include "bleUart.h"
+//#include "I2cEEPROM.h"
+
 #ifdef GYRO_PIN
 #include "imu.h"
 #endif
 #ifdef IR_PIN
 #include "infrared.h"
 #endif
-#include "espServo.h"
+
 #ifdef VOICE
 #include "voice.h"
 #endif
@@ -17,7 +19,11 @@
 #include "camera.h"
 #endif
 #include "randomMind.h"
+#include <hardware/watchdog.h>
+//#include <avr/wdt.h> 
+#include "eeprom.h"
 #include "io.h"
+#include "PCA9685servo.h"
 #include "motion.h"
 #include "skill.h"
 #ifdef NEOPIXEL_PIN
@@ -40,7 +46,9 @@ void initRobot() { //move the inti stuff from main file to here
 
   while (Serial.available() && Serial.read()); // empty buffer
   i2cDetect();
-  i2cEepromSetup();
+  #ifdef I2C_EEPROM
+    i2cEepromSetup();
+  #endif
 
   PTL('k');
 #ifdef GYRO_PIN

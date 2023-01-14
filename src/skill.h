@@ -286,12 +286,12 @@ void loadBySkillName(const char* skillName) {//get lookup information from on-bo
     char lr = skillName[strlen(skillName) - 1];
     skill->offsetLR = (lr == 'L' ? 30 : (lr == 'R' ? -30 : 0));
     if (strcmp(skillName, "calib") && skill->period == 1)
-      protectiveShift = esp_random() % 100 / 10.0 - 5;
+      protectiveShift = random() % 100 / 10.0 - 5;
     else
       protectiveShift = 0;
     for (byte i = 0; i < DOF; i++)
       skill->dutyAngles[i] += protectiveShift;
-    if (skill->offsetLR < 0 || skill->period <= 1 && skill->offsetLR == 0 && esp_random() % 2 && token != T_CALIBRATE)
+    if (skill->offsetLR < 0 || skill->period <= 1 && skill->offsetLR == 0 && random() % 2 && token != T_CALIBRATE)
       skill->mirror();//randomly mirror the direction of a behavior
     skill->transformToSkill(skill->nearestFrame());
     //    runDelay = delayMid + 2;

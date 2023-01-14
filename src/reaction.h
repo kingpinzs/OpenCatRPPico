@@ -337,7 +337,7 @@ void reaction() {
             delete [] skill;
           skill = new Skill(dataBuffer);
           skill->transformToSkill(skill->nearestFrame());
-          unsigned int i2cEepromAddress = SERIAL_BUFF + 2 + esp_random() % (EEPROM_SIZE - SERIAL_BUFF - 2 - 2550);//save to random position to protect the EEPROM
+          unsigned int i2cEepromAddress = SERIAL_BUFF + 2 + random() % (EEPROM_SIZE - SERIAL_BUFF - 2 - 2550);//save to random position to protect the EEPROM
           i2c_eeprom_write_int16(SERIAL_BUFF, i2cEepromAddress);
           copydataFromBufferToI2cEeprom(i2cEepromAddress, dataBuffer);
           newCmdIdx = 0;

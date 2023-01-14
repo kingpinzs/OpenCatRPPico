@@ -49,6 +49,8 @@
 // for both classes must be in the include path of your project
 #include "mpu6050/src/I2Cdev.h"
 
+//#include "MPU6050_6Axis_MotionApps_V6_12.h"
+
 #include "mpu6050/src/MPU6050_6Axis_MotionApps_V6_12.h"
 //#include "MPU6050.h" // not necessary if using MotionApps include file
 
@@ -107,21 +109,12 @@ MPU6050 mpu;
 // sensor, just without the effects of gravity. If you want acceleration
 // compensated for orientation, us OUTPUT_READABLE_WORLDACCEL instead.
 //#define OUTPUT_READABLE_REALACCEL
-/* REALACCEL represents the acceleration related to the sensor.
-   Even if the robot is not moving, it will be large if the sensor is tilted.
-   Because gravity has a component in that tilted direction.
-   It's useful to use aaReal.z to determine if the sensor is flipped up-side-down.
-*/
 
 // uncomment "OUTPUT_READABLE_WORLDACCEL" if you want to see acceleration
 // components with gravity removed and adjusted for the world frame of
 // reference (yaw is relative to initial orientation, since no magnetometer
 // is present in this case). Could be quite handy in some cases.
-#define OUTPUT_READABLE_WORLDACCEL
-/* WORLDACCEL represents the acceleration related to the world reference.
-   It will be close to zero as long as the robot is not moved.
-   It's useful to detect the wobbling about the sensor's original position.
-*/
+//#define OUTPUT_READABLE_WORLDACCEL
 
 // uncomment "OUTPUT_TEAPOT" if you want output that matches the
 // format used for the InvenSense teapot demo
@@ -143,236 +136,154 @@ VectorInt16 aaReal;   // [x, y, z]            gravity-free accel sensor measurem
 VectorInt16 aaWorld;  // [x, y, z]            world-frame accel sensor measurements
 VectorFloat gravity;  // [x, y, z]            gravity vector
 float euler[3];       // [psi, theta, phi]    Euler angle container
-float ypr[3];         // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector. unit is radian
-int8_t yprTilt[3];
+float ypr[3];         // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
-float originalYawDirection;
-
-// packet structure for InvenSense teapot demo
-uint8_t teapotPacket[14] = { '$', 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x00, '\r', '\n' };
-
+#define IMU_SKIP 2
+int16_t imuOffset[9] = { 0, 0, 0,
+                         0, 0, 0,
+                         0, 0, 0 };
 
 // ================================================================
 // ===               INTERRUPT DETECTION ROUTINE                ===
 // ================================================================
 
-volatile bool mpuInterrupt = false;  // indicates whether MPU interrupt pin has gone high
-void dmpDataReady() {
-  mpuInterrupt = true;
-}
+//volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
+//void dmpDataReady() {
+//  mpuInterrupt = true;
+//}
+
 
 void print6Axis() {
-
-#ifdef OUTPUT_READABLE_QUATERNION
-  // display quaternion values in easy matrix form: w x y z
-  Serial.print("quat\t");
-  Serial.print(q.w);
-  Serial.print("\t");
-  Serial.print(q.x);
-  Serial.print("\t");
-  Serial.print(q.y);
-  Serial.print("\t");
-  Serial.print(q.z);
-  Serial.print("\t");
-#endif
-
-#ifdef OUTPUT_READABLE_EULER
-  // display Euler angles in degrees
-  Serial.print("euler\t");
-  Serial.print(euler[0] * 180 / M_PI);
-  Serial.print("\t");
-  Serial.print(euler[1] * 180 / M_PI);
-  Serial.print("\t");
-  Serial.print(euler[2] * 180 / M_PI);
-  Serial.print("\t");
-#endif
-
-#ifdef OUTPUT_READABLE_YAWPITCHROLL
-  // display angles in degrees
-  Serial.print("ypr\t");
-  Serial.print(ypr[0]);
-  Serial.print("\t");
-  Serial.print(ypr[1]);
-  Serial.print("\t");
-  Serial.print(ypr[2]);
-  Serial.print("\t");
-  /*
-    mpu.dmpGetAccel(&aa, fifoBuffer);
-    Serial.print("\tRaw Accl XYZ\t");
-    Serial.print(aa.x);
-    Serial.print("\t");
-    Serial.print(aa.y);
-    Serial.print("\t");
-    Serial.print(aa.z);
-    mpu.dmpGetGyro(&gy, fifoBuffer);
-    Serial.print("\tRaw Gyro XYZ\t");
-    Serial.print(gy.x);
-    Serial.print("\t");
-    Serial.print(gy.y);
-    Serial.print("\t");
-    Serial.print(gy.z);
-    Serial.print("\t");
-  */
-#endif
-
-#ifdef OUTPUT_READABLE_WORLDACCEL
-  // display initial world-frame acceleration, adjusted to remove gravity
-  // and rotated based on known orientation from quaternion
-  Serial.print("aworld\t");
-  Serial.print(aaWorld.x);
-  Serial.print("\t");
-  Serial.print(aaWorld.y);
-  Serial.print("\t");
-  Serial.print(aaWorld.z);
-  Serial.print("\t");
-#endif
-
-#ifdef OUTPUT_READABLE_REALACCEL
-  // display real acceleration, adjusted to remove gravity
-  Serial.print("areal\t");
-  Serial.print(aaReal.x);
-  Serial.print("\t");
-  Serial.print(aaReal.y);
-  Serial.print("\t");
-#endif
-  Serial.print("areal.z\t");
-  Serial.print(aaReal.z);  //becomes negative when flipped
-  Serial.print("\t");
-
-  Serial.println();
+  Serial.print(ypr[0], 5);
+  PT('\t');
+  Serial.print(ypr[1], 5);
+  PT('\t');
+  Serial.print(ypr[2], 5);
+  //  PT("\t");
+  //  PT(aaWorld.x);
+  //  PT("\t");
+  //  PT(aaWorld.y);
+  //  PT("\t");
+  //  PTL(aaWorld.z / 1000);
+  //  PT('\t');
+  //  PT(aaReal.z);
+  PTL();
 }
-
 bool read_IMU() {
+  //  mpuInterrupt = false;
+  //  mpuIntStatus = mpu.getIntStatus();
+  //  PTL(mpuInterrupt);
   if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer)) {  // Get the Latest packet
     // display Euler angles in degrees
     mpu.dmpGetQuaternion(&q, fifoBuffer);
-    mpu.dmpGetAccel(&aa, fifoBuffer);
-    mpu.dmpGetEuler(euler, &q);
     mpu.dmpGetGravity(&gravity, &q);
     mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-    mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-    mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
+    //    mpu.dmpGetAccel(&aa, fifoBuffer);
+    //    mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
 
-    for (byte i = 0; i < 3; i++) {  //no need to flip yaw
+    for (int i = 0; i < 3; i++)
       ypr[i] *= degPerRad;
-#ifdef BiBoard
-      ypr[i] = -ypr[i];
-#endif
-    }
     if (printGyro)
       print6Axis();
-    exceptions = aaReal.z < 0 && fabs(ypr[2]) > 85;  //the second condition is used to filter out some noise
+    exceptions = fabs(ypr[2]) > 90;  // && aaReal.z < 0; //the second condition is used to filter out some noise
+    //however, its change is very slow.
     return true;
   }
   return false;
+}
+
+void readEnvironment() {
+  if (checkGyro && !(frame % IMU_SKIP))
+    read_IMU();
 }
 
 // ================================================================
 // ===                      INITIAL SETUP                       ===
 // ================================================================
 
+//This function will write a 2-byte integer to the EEPROM at the specified address and address + 1
+
 void imuSetup() {
-  // join I2C bus (I2Cdev library doesn't do this automatically)
-#if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
-  Wire.begin();
-  Wire.setClock(400000);  // 400kHz I2C clock. Comment this line if having compilation difficulties
-#elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
-  Fastwire::setup(400, true);
-#endif
-
-  // initialize serial communication
-  // (115200 chosen because it is required for Teapot Demo output, but it's
-  // really up to you depending on your project)
-  // Serial.begin(115200);
-  // while (!Serial)
-  // ;  // wait for Leonardo enumeration, others continue immediately
-
-  // NOTE: 8MHz or slower host processors, like the Teensy @ 3.3V or Arduino
-  // Pro Mini running at 3.3V, cannot handle this baud rate reliably due to
-  // the baud timing being too misaligned with processor ticks. You must use
-  // 38400 or slower in these cases, or use some kind of external separate
-  // crystal solution for the UART timer.
-  int connectAttempt = 0;
+  //#define WDTO_2S     7
+  //wdt_enable(WDTO_2S);
+  //watchdog_enable(7, 1);// why is this here?
   do {
-    delay(500);
+    delay(100);
     // initialize device
-    Serial.println(F("Initializing MPU..."));
-#if defined CONFIG_DISABLE_HAL_LOCKS && CONFIG_DISABLE_HAL_LOCKS == 1
-    Serial.println("OK");
-#else
-    Serial.println("If the program stucks, modify the header file:\n  https://docs.petoi.com/arduino-ide/upload-sketch-for-biboard#sdkconfig.h");
-#endif
+    PTLF("Init IMU");
     mpu.initialize();
-    pinMode(INTERRUPT_PIN, INPUT);
+    //    pinMode(GYRO_PIN, INPUT);
     // verify connection
-    Serial.print(F("- Testing MPU connections...attempt "));
-    Serial.println(connectAttempt++);
-
+    //    PTLF("Test connection");
   } while (!mpu.testConnection());
-  Serial.println(F("- MPU6050 connection successful"));
+  //  PTLF("Connected");
 
   // load and configure the DMP
-  Serial.println(F("- Initializing DMP..."));
-
+  //  PTLF("Init DMP");
   devStatus = mpu.dmpInitialize();
 
-  for (byte m = 0; m < 6; m++)
-    imuOffset[m] = i2c_eeprom_read_int16(EEPROM_IMU + m * 2);
   // supply the gyro offsets here, scaled for min sensitivity
-  mpu.setXAccelOffset(imuOffset[0]);
-  mpu.setYAccelOffset(imuOffset[1]);
-  mpu.setZAccelOffset(imuOffset[2]);  //gravity
-  mpu.setXGyroOffset(imuOffset[3]);   //yaw
-  mpu.setYGyroOffset(imuOffset[4]);   //pitch
-  mpu.setZGyroOffset(imuOffset[5]);   //roll
+  for (byte axis = 0; axis < 6; axis++) {
+    imuOffset[axis] = EEPROMReadInt(MPUCALIB + axis * 2);
+    if (axis < 3)
+      mpu.setAccelOffset(axis, imuOffset[axis]);
+    else
+      mpu.setGyroOffset(axis, imuOffset[axis]);
+  }
+  //  mpu.setXAccelOffset(imuOffset[0]);
+  //  mpu.setYAccelOffset(imuOffset[1]);
+  //  mpu.setZAccelOffset(imuOffset[2]);  //gravity
+  //  mpu.setXGyroOffset(imuOffset[3]);   //yaw
+  //  mpu.setYGyroOffset(imuOffset[4]);   //pitch
+  //  mpu.setZGyroOffset(imuOffset[5]);   //roll
 
   // make sure it worked (returns 0 if so)
   if (devStatus == 0) {
     // Calibration Time: generate offsets and calibrate our MPU6050
-    if (newBoard) {
+#ifndef MAIN_SKETCH
+    beep(10);
 #ifndef AUTO_INIT
-      PTL("- Calibrate the Inertial Measurement Unit (IMU)? (Y/n): ");
-      while (!Serial.available());
-      char choice = Serial.read();
-      Serial.println(choice);
-      if (choice == 'Y' || choice == 'y') {
-#else
-      PTL("- Calibrate the Inertial Measurement Unit (IMU)...");
+    PTLF("\nLay the robot/board FLAT on a table. Calibrate IMU?(Y/n):");
+    char choice = getUserInputChar();
+    PTL(choice);
+    if (choice == 'Y' || choice == 'y') {
 #endif
-        PTLF("\nPut the robot FLAT on the table and don't touch it during calibration.");
-#ifndef AUTO_INIT
-        beep(8, 500, 500, 5);
-#endif
-        beep(15, 500, 500, 1);
-        mpu.CalibrateAccel(20);
-        mpu.CalibrateGyro(20);
-        i2c_eeprom_write_int16(EEPROM_IMU, mpu.getXAccelOffset());
-        i2c_eeprom_write_int16(EEPROM_IMU + 2, mpu.getYAccelOffset());
-        i2c_eeprom_write_int16(EEPROM_IMU + 4, mpu.getZAccelOffset());
-        i2c_eeprom_write_int16(EEPROM_IMU + 6, mpu.getXGyroOffset());
-        i2c_eeprom_write_int16(EEPROM_IMU + 8, mpu.getYGyroOffset());
-        i2c_eeprom_write_int16(EEPROM_IMU + 10, mpu.getZGyroOffset());
-#ifndef AUTO_INIT
+      beep(15, 400, 600);
+      PTLF("Calibrating...");
+      mpu.CalibrateAccel(10);
+      mpu.CalibrateGyro(10);
+      for (byte axis = 0; axis < 6; axis++) {
+        if (axis < 3)
+          EEPROMWriteInt(MPUCALIB + axis * 2, mpu.getAccelOffset(axis));
+        else
+          EEPROMWriteInt(MPUCALIB + axis * 2, mpu.getGyroOffset(axis));
       }
-#endif
-      beep(18, 50, 50, 6);
-      mpu.PrintActiveOffsets();
+      //      EEPROMWriteInt(MPUCALIB, mpu.getXAccelOffset());
+      //      EEPROMWriteInt(MPUCALIB + 2, mpu.getYAccelOffset());
+      //      EEPROMWriteInt(MPUCALIB + 4, mpu.getZAccelOffset());
+      //      EEPROMWriteInt(MPUCALIB + 6, mpu.getXGyroOffset());
+      //      EEPROMWriteInt(MPUCALIB + 8, mpu.getYGyroOffset());
+      //      EEPROMWriteInt(MPUCALIB + 10, mpu.getZGyroOffset());
+
+#ifndef AUTO_INIT
     }
+#endif
+    //    printEEPROM();
+    beep(18, 50, 70, 6);
+#endif
+    //    mpu.PrintActiveOffsets(); //it takes 7% flash!
     // turn on the DMP, now that it's ready
-    Serial.println(F("- Enabling DMP..."));
+    //    PTLF("Enable DMP");
     mpu.setDMPEnabled(true);
 
     // enable Arduino interrupt detection
-    Serial.print(F("- Enabling interrupt detection (Arduino external interrupt "));
-    Serial.print(digitalPinToInterrupt(INTERRUPT_PIN));
-    Serial.println(F(")..."));
-    attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), dmpDataReady, RISING);
-    mpuIntStatus = mpu.getIntStatus();
+    //    PTL("Enable interrupt");
+    //    attachInterrupt(digitalPinToInterrupt(GYRO_PIN), dmpDataReady, RISING);
+    //    mpuIntStatus = mpu.getIntStatus();
 
     // set our DMP Ready flag so the main loop() function knows it's okay to use it
-    Serial.println(F("- DMP ready! Waiting for the first interrupt..."));
+    //    PTLF("DMP ready!");
     dmpReady = true;
-
     // get expected DMP packet size for later comparison
     packetSize = mpu.dmpGetFIFOPacketSize();
   } else {
@@ -380,25 +291,103 @@ void imuSetup() {
     // 1 = initial memory load failed
     // 2 = DMP configuration updates failed
     // (if it's going to break, usually the code will be 1)
-    Serial.print(F("- DMP Initialization failed (code "));
-    Serial.print(devStatus);
-    Serial.println(F(")"));
+    PTF("DMP failed (code ");
+    PT(devStatus);
+    PTL(')');
   }
-
-  delay(10);
-  read_IMU();
-  exceptions = aaReal.z < 0;
-  originalYawDirection = ypr[0];
 }
 
 // ================================================================
 // ===                    MAIN PROGRAM LOOP                     ===
 // ================================================================
-
-void imuExample() {
+/*
+  void imuExample() {
   // if programming failed, don't try to do anything
   if (!dmpReady) return;
   // read a packet from FIFO
-  read_IMU();
-  print6Axis();
-}
+  if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer)) { // Get the Latest packet
+  #ifdef OUTPUT_READABLE_QUATERNION
+    // display quaternion values in easy matrix form: w x y z
+    mpu.dmpGetQuaternion(&q, fifoBuffer);
+    PT("quat\t");
+    PT(q.w);
+    PT("\t");
+    PT(q.x);
+    PT("\t");
+    PT(q.y);
+    PT("\t");
+    PTL(q.z);
+  #endif
+
+  #ifdef OUTPUT_READABLE_EULER
+    // display Euler angles in degrees
+    mpu.dmpGetQuaternion(&q, fifoBuffer);
+    mpu.dmpGetEuler(euler, &q);
+    PT("euler\t");
+    PT(euler[0] * degPerRad);
+    PT("\t");
+    PT(euler[1] * degPerRad);
+    PT("\t");
+    PTL(euler[2] * degPerRad);
+  #endif
+
+  #ifdef OUTPUT_READABLE_YAWPITCHROLL
+    // display Euler angles in degrees
+    mpu.dmpGetQuaternion(&q, fifoBuffer);
+    mpu.dmpGetGravity(&gravity, &q);
+    mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+    PT("ypr\t");
+    PT(ypr[0] );
+    PT("\t");
+    PT(ypr[1] );
+    PT("\t");
+    PTL(ypr[2] );
+
+    mpu.dmpGetAccel(&aa, fifoBuffer);
+    PT("\tRaw Accl XYZ\t");
+    PT(aa.x);
+    PT("\t");
+    PT(aa.y);
+    PT("\t");
+    PT(aa.z);
+    mpu.dmpGetGyro(&gy, fifoBuffer);
+    PT("\tRaw Gyro XYZ\t");
+    PT(gy.x);
+    PT("\t");
+    PT(gy.y);
+    PT("\t");
+    PT(gy.z);
+
+  #endif
+
+  #ifdef OUTPUT_READABLE_REALACCEL
+    // display real acceleration, adjusted to remove gravity
+    mpu.dmpGetQuaternion(&q, fifoBuffer);
+    mpu.dmpGetAccel(&aa, fifoBuffer);
+    mpu.dmpGetGravity(&gravity, &q);
+    mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+    PT("areal\t");
+    PT(aaReal.x);
+    PT("\t");
+    PT(aaReal.y);
+    PT("\t");
+    PTL(aaReal.z);
+  #endif
+
+  #ifdef OUTPUT_READABLE_WORLDACCEL
+    // display initial world-frame acceleration, adjusted to remove gravity
+    // and rotated based on known orientation from quaternion
+    mpu.dmpGetQuaternion(&q, fifoBuffer);
+    mpu.dmpGetAccel(&aa, fifoBuffer);
+    mpu.dmpGetGravity(&gravity, &q);
+    mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+    mpu.dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
+    PT("aworld\t");
+    PT(aaWorld.x);
+    PT("\t");
+    PT(aaWorld.y);
+    PT("\t");
+    PTL(aaWorld.z);
+  #endif
+  }
+  }*/

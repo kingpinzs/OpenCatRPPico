@@ -48,7 +48,7 @@ void randomMind() {
   if (token != T_CALIBRATE && token != T_REST && idleTimer && (millis() - idleTimer) > idleThreshold * 1000) { //in idle state
     if (millis() - randTimer > randomInterval) {//every second throw a dice
       randTimer = millis();
-      int randomNum = esp_random() % randomBase;
+      int randomNum = random() % randomBase;//Update later to use the pico random generator hardware
       byte randomChoice = -1;
       while (randomNum >= 0) {
         randomChoice++;

@@ -34,7 +34,7 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-#include "PetoiESP32Servo/ESP32Servo.h"
+//#include "PetoiESP32Servo/ESP32Servo.h" <- looking into this
 #define BASE_PITCH 1046.50
 int loopCounter = 0;
 // tone 1 corresponds to A3, tone 2 corresponds to B3, tone 13 corresponds to A4, etc.

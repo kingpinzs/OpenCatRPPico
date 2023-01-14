@@ -69,7 +69,7 @@
 #define PWM_NUM 12
 #define INTERRUPT_PIN 26  // use pin 2 on Arduino Uno & most boards
 #define BUZZER 25
-#define IR_PIN 23
+//#define IR_PIN 23
 //L:Left-R:Right-F:Front-B:Back---LF, RF, RB, LB
 const uint8_t PWM_pin[PWM_NUM] = {19,  4,  2, 27,   //head or shoulder roll
                                   33,  5, 15, 14,   //shoulder pitch
@@ -90,11 +90,12 @@ const uint8_t PWM_pin[PWM_NUM] = {19,  4,  2, 27,   //head or shoulder roll
 #define LOW_VOLTAGE 6.8
 #define NEOPIXEL_PIN 15
 #define PWM_LED_PIN  5
-#define IR_PIN 23
-#define TOUCH0 12
-#define TOUCH1 13
-#define TOUCH2 32
-#define TOUCH3 33
+//#define I2C_EEPROM  //comment this line out if you don't have an I2C EEPROM in your DIY board.
+//#define IR_PIN 23
+// #define TOUCH0 12
+// #define TOUCH1 13
+// #define TOUCH2 32
+// #define TOUCH3 33
 
 //                                headPan, tilt, tailPan, NA
 const uint8_t PWM_pin[PWM_NUM] = {12,       11,     4,    3,
@@ -161,6 +162,29 @@ ServoModel_t servoModelList[] = {
 };
 
 bool newBoard = false;
+
+//on-board EEPROM addresses
+#define MELODY_NORMAL 1023  //melody will be saved at the end of the 1KB EEPROM, and is read reversely. That allows some flexibility on the melody length.
+#define MELODY_INIT 1002
+#define MELODY_LOW_BATTERY 977
+#define MELODY_1 966
+#define PWM_PIN 0                     // 16 byte array
+#define CALIB 16                      // 16 byte array
+#define MID_SHIFT 32                  // 16 byte array
+#define ROTATION_DIRECTION 48         // 16 byte array
+#define ZERO_POSITIONS 64             // 16*2 = 32   64+32 = 96
+#define CALIBRATED_ZERO_POSITIONS 96  // 16*2 = 32   96+32 = 128
+#define ADAPT_PARAM 128               // 16 x 2 byte array 128+32 = 160
+#define ANGLE2PULSE_FACTOR 160        // 16*2 = 32  160+32 = 192
+#define ANGLE_LIMIT 192               // 16*2*2 = 64   192+64 = 256
+#define MPUCALIB 256                  // 9 int byte array 9x2 =18  256+18=274
+#define B_OFFSET 274                  // 1 bytes
+#define PCA9685_FREQ 275              // 2 bytes
+#define NUM_SKILLS 277                // 1 bytes
+#define SERIAL_BUFF 278               // 2 bytes
+#define SERIAL_BUFF_RAND 280          // 2 bytes
+#define SKILLS 320                    // 1 byte for skill name length, followed by the char array for skill name
+
 
 #include <math.h>
 //token list
@@ -315,10 +339,6 @@ int8_t servoCalib[DOF] = {0, 0, 0, 0,
                           0, 0, 0, 0
                          };
 
-int16_t imuOffset[9] = {0, 0, 0,
-                        0, 0, 0,
-                        0, 0, 0
-                       };
 
 //abbreviations
 #define PT(s) Serial.print(s)  //makes life easier

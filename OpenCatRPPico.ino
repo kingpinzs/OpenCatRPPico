@@ -34,7 +34,7 @@ void setup() {
 
   lastCmd[0] = '\0';
   newCmd[0] = '\0';
-  initRobot()//moved all the init stuff to the header
+  initRobot();//moved all the init stuff to the header
 }
 
 void loop() {
@@ -65,5 +65,5 @@ reaction();  //handle different commands
 #ifdef
   calibratePCA9685();
 #endif
-
+#endif
 }
