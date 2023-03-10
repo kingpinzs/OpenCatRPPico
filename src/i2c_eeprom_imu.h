@@ -316,15 +316,15 @@ void imuSetup() {
 
   devStatus = mpu.dmpInitialize();
 
-  for (byte m = 0; m < 6; m++)
-    imuOffset[m] = i2c_eeprom_read_int16(EEPROM_IMU + m * 2);
+ /*  for (byte m = 0; m < 6; m++)
+    imuOffset[m] = ;//use a varible in place of this i2c_eeprom_read_int16(EEPROM_IMU + m * 2);
   // supply the gyro offsets here, scaled for min sensitivity
   mpu.setXAccelOffset(imuOffset[0]);
   mpu.setYAccelOffset(imuOffset[1]);
   mpu.setZAccelOffset(imuOffset[2]);  //gravity
   mpu.setXGyroOffset(imuOffset[3]);   //yaw
   mpu.setYGyroOffset(imuOffset[4]);   //pitch
-  mpu.setZGyroOffset(imuOffset[5]);   //roll
+  mpu.setZGyroOffset(imuOffset[5]);   //roll */
 
   // make sure it worked (returns 0 if so)
   if (devStatus == 0) {
@@ -346,12 +346,18 @@ void imuSetup() {
         beep(15, 500, 500, 1);
         mpu.CalibrateAccel(20);
         mpu.CalibrateGyro(20);
-        i2c_eeprom_write_int16(EEPROM_IMU, mpu.getXAccelOffset());
-        i2c_eeprom_write_int16(EEPROM_IMU + 2, mpu.getYAccelOffset());
-        i2c_eeprom_write_int16(EEPROM_IMU + 4, mpu.getZAccelOffset());
-        i2c_eeprom_write_int16(EEPROM_IMU + 6, mpu.getXGyroOffset());
-        i2c_eeprom_write_int16(EEPROM_IMU + 8, mpu.getYGyroOffset());
-        i2c_eeprom_write_int16(EEPROM_IMU + 10, mpu.getZGyroOffset());
+        PTLF(mpu.getXAccelOffset());
+        PTLF(mpu.getYAccelOffset());
+        PTLF(mpu.getZAccelOffset());
+        PTLF(mpu.getXGyroOffset());
+        PTLF(mpu.getYGyroOffset());
+        PTLF(mpu.getZGyroOffset());
+        //i2c_eeprom_write_int16(EEPROM_IMU, mpu.getXAccelOffset());
+        //i2c_eeprom_write_int16(EEPROM_IMU + 2, mpu.getYAccelOffset());
+        //i2c_eeprom_write_int16(EEPROM_IMU + 4, mpu.getZAccelOffset());
+        //i2c_eeprom_write_int16(EEPROM_IMU + 6, mpu.getXGyroOffset());
+        //i2c_eeprom_write_int16(EEPROM_IMU + 8, mpu.getYGyroOffset());
+        //i2c_eeprom_write_int16(EEPROM_IMU + 10, mpu.getZGyroOffset());
 #ifndef AUTO_INIT
       }
 #endif

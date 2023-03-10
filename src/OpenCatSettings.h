@@ -14,37 +14,37 @@
                         |    PWM[5]           PWM[11]   |
                         |-------------------------------|
 
-    Pin Name    |   ESP32 Pin   |   Arduino Pin Name    |   Alternative Function
-    PWM[0]          GPIO4               4                   GPIO / Ain / Touch
-    PWM[1]          GPIO5               5                   GPIO / VSPI SS
-    PWM[2]          GPIO18              18                  GPIO / VSPI SCK
-    -----------------------------------------------------------------------------
-    PWM[3]          GPIO32              32                  GPIO / Ain / Touch
-    PWM[4]          GPIO33              33                  GPIO / Ain / Touch
-    PWM[5]          GPIO19              19                  GPIO / VSPI MISO
-    -----------------------------------------------------------------------------
-    PWM[6]          GPIO2               2                   boot pin, DO NOT PUT HIGH WHEN BOOT!
-    PWM[7]          GPIO15              15                  GPIO / HSPI SS / Ain Touch
-    PWM[8]          GPIO13              13                  built-in LED / GPIO / HSPI MOSI / Ain / Touch
-    -----------------------------------------------------------------------------
-    PWM[9]          GPIO12              12                  GPIO / HSPI MISO / Ain / Touch
-    PWM[10]         GPIO14              14                  GPIO / HSPI SCK / Ain / Touch
-    PWM[11]         GPIO27              27                  GPIO / Ain / Touch
+    Pin Name    |   ESP32 Pin   | RBP Pico Pin Name | Arduino Pin Name    |   Alternative Function
+    PWM[0]          GPIO4                                    4                   GPIO / Ain / Touch
+    PWM[1]          GPIO5                                    5                   GPIO / VSPI SS
+    PWM[2]          GPIO18                                   18                  GPIO / VSPI SCK
+    -------------------------------------------------------------------------------------------------
+    PWM[3]          GPIO32                                   32                  GPIO / Ain / Touch
+    PWM[4]          GPIO33                                   33                  GPIO / Ain / Touch
+    PWM[5]          GPIO19                                   19                  GPIO / VSPI MISO
+    --------------------------------------------------------------------------------------------------
+    PWM[6]          GPIO2                                    2                   boot pin, DO NOT PUT HIGH WHEN BOOT!
+    PWM[7]          GPIO15                                   15                  GPIO / HSPI SS / Ain Touch
+    PWM[8]          GPIO13                                   13                  built-in LED / GPIO / HSPI MOSI / Ain / Touch
+    --------------------------------------------------------------------------------------------------
+    PWM[9]          GPIO12                                   12                  GPIO / HSPI MISO / Ain / Touch
+    PWM[10]         GPIO14                                   14                  GPIO / HSPI SCK / Ain / Touch
+    PWM[11]         GPIO27                                   27                  GPIO / Ain / Touch
 
     I2C:
 
-    Pin Name    |   ESP32 Pin   |   Arduino Pin Name    |   Alternative Function
-    I2C-SCL         GPIO22              22                  Fixed - ICM20600 - Pulled
-    I2C-SDA         GPIO21              21                  Fixed = ICM20600 - Pulled
+    Pin Name    |   ESP32 Pin   | RBP Pico Pin Name |  Arduino Pin Name    |   Alternative Function
+    I2C-SCL         GPIO22                                    22                  Fixed - ICM20600 - Pulled
+    I2C-SDA         GPIO21                                    21                  Fixed = ICM20600 - Pulled
 
     System default, nothing to declaration!
 
     Other Peripherals:
 
-    Pin Name    |   ESP32 Pin   |   Arduino Pin Name    |   Alternative Function
-    IR_Remote       GPIO23              23                  Fixed - VS1838B IR
-    DAC_Out         GPIO25              25                  Fixed - PAM8302
-    IMU_Int         GPIO26              26                  Fixed - MPU6050 Interrupt
+    Pin Name    |   ESP32 Pin   | RBP Pico Pin Name |  Arduino Pin Name    |   Alternative Function
+    IR_Remote       GPIO23                                   23                  Fixed - VS1838B IR
+    DAC_Out         GPIO25                                   25                  Fixed - PAM8302
+    IMU_Int         GPIO26                                   26                  Fixed - MPU6050 Interrupt
 
     System default, nothing to declaration!
 */
@@ -63,77 +63,39 @@
    BiBoard2 (16)  skip 0~8  skip 0~8  skip0~4
 */
 
-#define BIRTHMARK 'x' //Send 'R' token to reset the birthmark in the EEPROM so that the robot will know to restart and reset
-#ifdef BiBoard
-#define GYRO_PIN
+/*
+The INTERRUPT_PIN is what ever you set it to be
+
+We define a pin as being the “interrupt input”, and we define what change of state on that point is considered to be an interrupt. On the Pico, we can use any GPIO pin for this, and we can define more than one.
+We create an “interrupt handler” function, something we want to run when an interrupt is detected.
+We pair that “interrupt handler” with the “interrupt input”.
+
+*/
+#define PICO
+#define INTERRUPT_PIN 26
+#define GYRO_PIN_SCL 4
+#define GYRO_PIN_SDA 5
 #define PWM_NUM 12
-#define INTERRUPT_PIN 26  // use pin 2 on Arduino Uno & most boards
-#define BUZZER 25
-//#define IR_PIN 23
 //L:Left-R:Right-F:Front-B:Back---LF, RF, RB, LB
 const uint8_t PWM_pin[PWM_NUM] = {19,  4,  2, 27,   //head or shoulder roll
                                   33,  5, 15, 14,   //shoulder pitch
                                   32, 18, 13, 12    //knee
                                  };
-#if defined NYBBLE || defined BITTLE
-#define SERVO_FREQ 240
-#else //CUB
-#define SERVO_FREQ 240
-#endif
-
-#else //BiBoard2
-#define GYRO_PIN
-#define PWM_NUM 16
-#define INTERRUPT_PIN 27  // use pin 2 on Arduino Uno & most boards
-#define BUZZER 14
+#define SERVO_FREQ 240 //test frequincy between 200 and 300 to see what prefomce the best
 #define VOLTAGE 4
 #define LOW_VOLTAGE 6.8
-
 #define VOLTAGE_DETECTION_PIN A0  //voltage detector
-#define DEVICE_ADDRESS 0x50  //I2C Address of eeprom chip
-
-#define DEVICE_ADDRESS 0x50  //I2C Address of eeprom chip
-#define NEOPIXEL_PIN 15
-#define PWM_LED_PIN  5
-//#define I2C_EEPROM  //comment this line out if you don't have an I2C EEPROM in your DIY board.
-//#define IR_PIN 23
-// #define TOUCH0 12
-// #define TOUCH1 13
-// #define TOUCH2 32
-// #define TOUCH3 33
-
-//                                headPan, tilt, tailPan, NA
-byte pwm_pin[] = { 7, 0, 15, 8,
-                   6, 1, 14, 9,
-                   5, 2, 13, 10,
-                   4, 3, 12, 11 };
-const uint8_t PWM_pin[PWM_NUM] = {12,       11,     4,    3,
-                                  13,       10,     5,    2,     //shoulder roll
-                                  14,       9,      6,    1,     //shoulder pitch
-                                  //                                  13,       10,     6,    2,     //shoulder roll
-                                  //                                  14,        9,     5,    1,     //shoulder pitch
-                                  15,       8,      7,    0      //knee
-                                 };
-//L:Left R:Right F:Front B:Back   LF,        RF,    RB,   LB
-
-
-#define SERVO_FREQ 240
-#endif
-
 #define DOF 16
-#if defined NYBBLE || defined BITTLE
 #define WALKING_DOF 8
 #define GAIT_ARRAY_DOF 8
-#else //CUB
-#define WALKING_DOF 12
-#define GAIT_ARRAY_DOF 8
-#endif
 
 enum ServoModel_t {
   G41 = 0,
   P1S,
-  P2K
+  P2K,
+  HS55,
 };
+
 
 
 //Tutorial: https://bittle.petoi.com/11-tutorial-on-creating-new-skills
@@ -170,35 +132,6 @@ ServoModel_t servoModelList[] = {
   REGULAR, REGULAR, REGULAR, REGULAR,
   KNEE, KNEE, KNEE, KNEE
 };
-
-bool newBoard = false;
-
-//on-board EEPROM addresses
-#define MELODY_NORMAL 1023  //melody will be saved at the end of the 1KB EEPROM, and is read reversely. That allows some flexibility on the melody length.
-#define MELODY_INIT (byte*)1002
-#define MELODY_LOW_BATTERY 977
-#define MELODY_1 966
-#define PWM_PIN 0                     // 16 byte array
-#define CALIB 16                      // 16 byte array
-#define MID_SHIFT 32                  // 16 byte array
-#define ROTATION_DIRECTION 48         // 16 byte array
-#define ZERO_POSITIONS 64             // 16*2 = 32   64+32 = 96
-#define CALIBRATED_ZERO_POSITIONS 96  // 16*2 = 32   96+32 = 128
-#define ADAPT_PARAM 128               // 16 x 2 byte array 128+32 = 160
-#define ANGLE2PULSE_FACTOR 160        // 16*2 = 32  160+32 = 192
-#define ANGLE_LIMIT 192               // 16*2*2 = 64   192+64 = 256
-#define MPUCALIB 256                  // 9 int byte array 9x2 =18  256+18=274
-#define B_OFFSET 274                  // 1 bytes
-#define PCA9685_FREQ 275              // 2 bytes
-#define NUM_SKILLS 277                // 1 bytes
-#define SERIAL_BUFF 278               // 2 bytes
-#define SERIAL_BUFF_RAND 280          // 2 bytes
-#define SKILLS 320                    // 1 byte for skill name length, followed by the char array for skill name
-
-//the actual data is stored on the I2C EEPROM.
-#define INITIAL_SKILL_DATA_ADDRESS 32
-//The first several bytes are reserved for testing
-//the above constants from onboard EEPROM to I2C EEPROM
 
 #include <math.h>
 //token list

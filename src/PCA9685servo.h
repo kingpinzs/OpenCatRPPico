@@ -7,7 +7,7 @@
   ------> http://www.adafruit.com/products/815
 
   These drivers use I2C to communicate, 2 pins are required to
-  interface.
+  interface.SERVO_FREQ
 
   Adafruit invests time and resources providing this open source code,
   please support Adafruit and open-source hardware by purchasing

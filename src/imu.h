@@ -111,8 +111,7 @@ MPU6050 mpu;
 //#define OUTPUT_READABLE_REALACCEL
 
 // uncomment "OUTPUT_READABLE_WORLDACCEL" if you want to see acceleration
-// components with gravity removed and adjusted for the world frame of
-// reference (yaw is relative to initial orientation, since no magnetometer
+// components with gravity removed and adjusted for up to 16MB of off-chip flash since no magnetometer
 // is present in this case). Could be quite handy in some cases.
 //#define OUTPUT_READABLE_WORLDACCEL
 

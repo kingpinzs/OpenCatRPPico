@@ -1,4 +1,3 @@
-
 const char *randomMindList[] = {"iRand", "ksit", //"u",
 #ifdef CUB
                                 "kfd", "krt",
